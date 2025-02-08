@@ -1,7 +1,7 @@
 #include <ezButton.h>
 
-#define VRX_PIN  A1 // Arduino pin connected to VRX pin
-#define VRY_PIN  A0 // Arduino pin connected to VRY pin
+#define VRY_PIN  A1 // Arduino pin connected to VRX pin
+#define VRX_PIN  A0 // Arduino pin connected to VRY pin
 #define SW_PIN   2  // Arduino pin connected to SW  pin
 #define AL1 5  // Motor A pins
 #define AL2 6
@@ -67,8 +67,8 @@ void loop() {
   button.loop(); // MUST call the loop() function first
 
   // read analog X and Y analog values
-  xValue = analogRead(VRX_PIN);
-  yValue = analogRead(VRY_PIN);
+  xValue = 1023 - analogRead(VRX_PIN);
+  yValue = 1023 - analogRead(VRY_PIN);
 
   // Read the button value
   bValue = button.getState();
