@@ -37,7 +37,7 @@ void setup() {
   Serial.println("3.stop");
 }
 
-int  input = 0;
+int  input = 0;a
 void loop() {
   
   if (Serial.available() > 0) {
