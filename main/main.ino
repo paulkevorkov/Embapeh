@@ -1,22 +1,30 @@
 #include <ezButton.h>
 //
 
-#define VRX_PIN  A1 // Arduino pin connected to VRX pin
-#define VRY_PIN  A0 // Arduino pin connected to VRY pin
-#define SW_PIN   2  // Arduino pin connected to SW  pin
+#define VLX_PIN  A0 // Arduino pin connected to VRX pin
+#define VLY_PIN  A1 // Arduino pin connected to VRY pin
+#define SWL_PIN   2  // Arduino pin connected to SW  pin
+
+#define VRX_PIN  A2
+#define VRY_PIN  A3
+#define SWR_PIN   4
 
 #define AL1 5  // Motor A pins
 #define AL2 6
-#define AR1 10 // Motor B pins
-#define AR2 11
+#define AR1 11 // Motor B pins
+#define AR2 10
 
 int incomingByte = 0; // for incoming serial data
 
-ezButton button(SW_PIN);
+ezButton leftButton(SWL_PIN);
+ezButton rightButton(SWR_PIN);
 
-int xValue = 0; // To store value of the X axis
-int yValue = 0; // To store value of the Y axis
+int lyValue = 0; // To store value of the X axis
+int ryValue = 0; // To store value of the Y axis
 int bValue = 0; // To store value of the button
+
+int leftSpeed = 0;
+int rightSpeed = 0;
 
 void setup() {
   pinMode(AL1, OUTPUT);
@@ -30,46 +38,73 @@ void setup() {
   digitalWrite(AR2, LOW);
   
   Serial.begin(9600) ;
-  button.setDebounceTime(50); // set debounce time to 50 milliseconds
+  leftButton.setDebounceTime(50); // set debounce time to 50 milliseconds
 
-  Serial.println("select direction of movement");
-  Serial.println("1.forward");
-  Serial.println("2.backward");
-  Serial.println("3.stop");
 }
 
-int  input = 0;a
+int  input = 0;
 void loop() {
   
-  if (Serial.available() > 0) {
-    // read the incoming byte:
-    incomingByte = Serial.read();
-    input = incomingByte - 48; //convert ASCII code of numbers to 1,2,3
-
-    switch (input) { 
-    case 1:         // if input=1 ....... motors turn forward
-      forward();
-      break;
-    case 2:         // if input=2 ....... motors turn backward
-      backward();
-      break;
-    case 3:         // if input=1 ....... motors turn stop
-      Stop();
-      break;
-    }
-  delay(200);
-  input=0;
-  }
   
-  button.loop(); // MUST call the loop() function first
+  
+  //button.loop(); // MUST call the loop() function first
 
   // read analog X and Y analog values
-  xValue = analogRead(VRX_PIN);
-  yValue = analogRead(VRY_PIN);
+  lyValue = 1023 - analogRead(VLY_PIN);
+  ryValue = 1023 - analogRead(VRY_PIN);
+
+  Serial.print("Left joystick: ");
+  Serial.println(lyValue);
+
+  Serial.print("Right joystick: ");
+  Serial.println(ryValue);
+  Serial.println();
+
+  //rxValue = 1023 - analogRead(VRX_PIN);
+  //ryValue = 1023 - analogRead(VRY_PIN);
+
+  
+  // left joystick
+  if (lyValue > 550) {
+    leftSpeed = map(lyValue, 550, 1023, 0, 255);
+    analogWrite(AL1, leftSpeed);
+    analogWrite(AL2, 0);
+  }
+  else if (lyValue < 470) {
+    leftSpeed = map(lyValue, 470, 0, 0, 255);
+    analogWrite(AL1, 0);
+    analogWrite(AL2, leftSpeed);
+  }
+  else {
+    leftSpeed = 0;
+    analogWrite(AL1, 0);
+    analogWrite(AL2, 0);
+  }
+
+  // right joystick
+  if (ryValue > 550) {
+    rightSpeed = map(ryValue, 550, 1023, 0, 255);
+    analogWrite(AR1, rightSpeed);
+    analogWrite(AR2, 0);
+  }
+  else if (ryValue < 470) {
+    rightSpeed = map(ryValue, 470, 0, 0, 255);
+    analogWrite(AR1, 0);
+    analogWrite(AR2, rightSpeed);
+  }
+  else {
+    rightSpeed = 0;
+    analogWrite(AR1, 0);
+    analogWrite(AR2, 0);
+  }
+  
+
+
 
   // Read the button value
-  bValue = button.getState();
+  //lbValue = button.getState();
 
+  /*
   if (button.isPressed()) {
     Serial.println("The button is pressed");
     // TODO do something here
@@ -78,15 +113,9 @@ void loop() {
   if (button.isReleased()) {
     Serial.println("The button is released");
     // TODO do something here
-  }
+  }*/
+  
 
-  // print data to Serial Monitor on Arduino IDE
-  Serial.print("x = ");
-  Serial.print(xValue);
-  Serial.print(", y = ");
-  Serial.print(yValue);
-  Serial.print(" : button = ");
-  Serial.println(bValue);
 
   delay(50);
 }
