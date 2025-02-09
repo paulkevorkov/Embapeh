@@ -5,8 +5,8 @@
 #define VLY_PIN  A1 // Arduino pin connected to VRY pin
 #define SWL_PIN   2  // Arduino pin connected to SW  pin
 
-#define VRX_PIN  A2
-#define VRY_PIN  A3
+#define VRX_PIN  A3
+#define VRY_PIN  A2
 #define SWR_PIN   4
 
 #define AL1 5  // Motor A pins
@@ -39,6 +39,8 @@ void setup() {
   
   Serial.begin(9600) ;
   leftButton.setDebounceTime(50); // set debounce time to 50 milliseconds
+
+  Serial.println("Starting");
 
 }
 
