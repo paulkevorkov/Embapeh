@@ -26,6 +26,9 @@ int bValue = 0; // To store value of the button
 int leftSpeed = 0;
 int rightSpeed = 0;
 
+int switchSpeed = 0;  // 0 means fast mode, 1 means slow mode
+int maxMapValue = 0; //255 is fast mode, 120 is slow mode
+
 void setup() {
   pinMode(AL1, OUTPUT);
   pinMode(AL2, OUTPUT);
@@ -38,18 +41,27 @@ void setup() {
   digitalWrite(AR2, LOW);
   
   Serial.begin(9600) ;
-  leftButton.setDebounceTime(50); // set debounce time to 50 milliseconds
-
+  leftButton.setDebounceTime(30); // set debounce time to 50 milliseconds
+  rightButton.setDebounceTime(30);
   Serial.println("Starting");
 
 }
 
-int  input = 0;
 void loop() {
-  
-  
-  
-  //button.loop(); // MUST call the loop() function first
+  leftButton.loop(); // MUST call the loop() function first
+  rightButton.loop();
+
+  // Read the button value  
+  if (leftButton.isPressed()) {
+    Serial.println("The button is pressed");
+    switchSpeed = !switchSpeed;
+  }
+
+  if (switchSpeed) {
+    maxMapValue = 180;
+  } else {
+    maxMapValue = 255;
+  }
 
   // read analog X and Y analog values
   lyValue = 1023 - analogRead(VLY_PIN);
@@ -68,12 +80,12 @@ void loop() {
   
   // left joystick
   if (lyValue > 550) {
-    leftSpeed = map(lyValue, 550, 1023, 0, 255);
+    leftSpeed = map(lyValue, 550, 1023, 0, maxMapValue);
     analogWrite(AL1, leftSpeed);
     analogWrite(AL2, 0);
   }
   else if (lyValue < 470) {
-    leftSpeed = map(lyValue, 470, 0, 0, 255);
+    leftSpeed = map(lyValue, 470, 0, 0, maxMapValue);
     analogWrite(AL1, 0);
     analogWrite(AL2, leftSpeed);
   }
@@ -85,12 +97,12 @@ void loop() {
 
   // right joystick
   if (ryValue > 550) {
-    rightSpeed = map(ryValue, 550, 1023, 0, 255);
+    rightSpeed = map(ryValue, 550, 1023, 0, maxMapValue);
     analogWrite(AR1, rightSpeed);
     analogWrite(AR2, 0);
   }
   else if (ryValue < 470) {
-    rightSpeed = map(ryValue, 470, 0, 0, 255);
+    rightSpeed = map(ryValue, 470, 0, 0, maxMapValue);
     analogWrite(AR1, 0);
     analogWrite(AR2, rightSpeed);
   }
@@ -99,46 +111,13 @@ void loop() {
     analogWrite(AR1, 0);
     analogWrite(AR2, 0);
   }
-  
 
-
-
-  // Read the button value
-  //lbValue = button.getState();
-
-  /*
-  if (button.isPressed()) {
-    Serial.println("The button is pressed");
-    // TODO do something here
-  }
-
-  if (button.isReleased()) {
+  /*if (button.isReleased()) {
     Serial.println("The button is released");
     // TODO do something here
   }*/
   
-
-
   delay(50);
 }
 
-void forward() {          //function of forward 
-  analogWrite(AL1, 120);
-  analogWrite(AL2, 0);
-  analogWrite(AR1, 120);
-  analogWrite(AR2, 0);
-}
 
-void backward() {         //function of backward
-  analogWrite(AL1, 0);
-  analogWrite(AL2, 120);
-  analogWrite(AR1, 0);
-  analogWrite(AR2, 120);
-}
-
-void Stop() {              //function of stop
-  digitalWrite(AL1, LOW);
-  digitalWrite(AL2, LOW);
-  digitalWrite(AR1, LOW);
-  digitalWrite(AR2, LOW);
-}
