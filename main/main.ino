@@ -1,5 +1,5 @@
 #include <ezButton.h>
-//
+#include <Servo.h>
 
 #define VLX_PIN  A0 // Arduino pin connected to VRX pin
 #define VLY_PIN  A1 // Arduino pin connected to VRY pin
@@ -13,6 +13,10 @@
 #define AL2 6
 #define AR1 11 // Motor B pins
 #define AR2 10
+
+#define SERVO_PIN 9   // servo
+Servo servo;
+
 
 int incomingByte = 0; // for incoming serial data
 
@@ -40,6 +44,8 @@ void setup() {
   digitalWrite(AR1, LOW);
   digitalWrite(AR2, LOW);
   
+  servo.attach(SERVO_PIN);   // assigns PWM pin to the servo object
+
   Serial.begin(9600) ;
   leftButton.setDebounceTime(30); // set debounce time to 50 milliseconds
   rightButton.setDebounceTime(30);
@@ -47,13 +53,30 @@ void setup() {
 
 }
 
+int defaultAngle = 100;  
+int kickAngle = 180;
+long timer = millis();
+long startTime = millis();
 void loop() {
   leftButton.loop(); // MUST call the loop() function first
   rightButton.loop();
 
-  // Read the button value  
+  timer = millis();
+
+  if (rightButton.isPressed()){
+    startTime = millis();
+    servo.write(kickAngle);
+    //Serial.println("Right button is pressed");
+    //Serial.print("Timer: "); Serial.println(timer);
+    //Serial.print("startTime: "); Serial.println(startTime);
+  }
+  if (timer - startTime >= 500){
+    servo.write(defaultAngle);
+  }
+
+  // Left button status for speed
   if (leftButton.isPressed()) {
-    Serial.println("The button is pressed");
+    Serial.println("Left button is pressed");
     switchSpeed = !switchSpeed;
   }
 
@@ -67,12 +90,12 @@ void loop() {
   lyValue = 1023 - analogRead(VLY_PIN);
   ryValue = 1023 - analogRead(VRY_PIN);
 
-  Serial.print("Left joystick: ");
+  /*Serial.print("Left joystick: ");
   Serial.println(lyValue);
 
   Serial.print("Right joystick: ");
   Serial.println(ryValue);
-  Serial.println();
+  Serial.println();*/
 
   //rxValue = 1023 - analogRead(VRX_PIN);
   //ryValue = 1023 - analogRead(VRY_PIN);
@@ -111,11 +134,6 @@ void loop() {
     analogWrite(AR1, 0);
     analogWrite(AR2, 0);
   }
-
-  /*if (button.isReleased()) {
-    Serial.println("The button is released");
-    // TODO do something here
-  }*/
   
   delay(50);
 }
