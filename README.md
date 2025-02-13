@@ -17,3 +17,8 @@ The bot is operated by an Arduino Uno, and controlled by two joysticks mounted t
 
 - Embapeh also features a **Focus** mode: by pressing on the left joystick, the speed of the bot is reduced to allow precise movement
 - Embapeh also features a **Bunter**: by clicking the right joystick, small bunter is extended to provide (little to no) kicking power!
+
+
+
+https://github.com/user-attachments/assets/bfd66ce5-2818-4e2f-8171-7526fca2440e
+
